@@ -106,9 +106,21 @@ class ListaAtividade(Resource):
             'id':atividade.id
         }
         return response
+class ListarAtividadesPessoa(Resource):
+    def get(self,a):
+        atividades = Atividades.query.all()
+        response=[{
+            'id':i.id,
+            'nome':i.nome,
+            'pessoa':i.pessoa.nome
+
+        }for i in atividades if i.pessoa.nome == a]
+        return response
+
 
 api.add_resource(Pessoa, '/pessoa/<string:nome>/')
 api.add_resource(ListaPessoas, '/pessoa/')
 api.add_resource(ListaAtividade,'/atividades/')
+api.add_resource(ListarAtividadesPessoa, '/atividades/<string:a>/')
 if __name__ == '__main__':
     app.run(debug=True)

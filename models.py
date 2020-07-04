@@ -30,6 +30,7 @@ class Atividades(Base):
     __tablename__ = 'atividades'
     id = Column(Integer, primary_key=True)
     nome = Column(String(80))
+    status = Column(Integer)#0 = pendente 1=concluido
     pessoa_id = Column(Integer, ForeignKey('pessoas.id'))
     pessoa = relationship("Pessoas")
 

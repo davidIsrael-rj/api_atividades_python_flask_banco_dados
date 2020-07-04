@@ -32,7 +32,7 @@ def verificacao(login, senha):
     return Usuario.query.filter_by(login = login, senha = senha).first()
 
 class Pessoa(Resource):
-    @auth.login_required
+
     def get(self, nome):
         pessoa = Pessoas.query.filter_by(nome=nome).first()
         #pessoa = Pessoas.query.all()
@@ -50,7 +50,10 @@ class Pessoa(Resource):
         except Exception:
             response = {'status': 'erro', 'mensagem': 'erro desconhecido contate o administrador da API'}
         return response
+
+    @auth.login_required
     def put(self, nome):
+
         try:
             pessoa = Pessoas.query.filter_by(nome=nome).first()
             dados = request.json
@@ -70,7 +73,10 @@ class Pessoa(Resource):
         except Exception:
             response = {'status':'erro', 'mensagem':'erro desconhecido contate o administrador da API'}
         return response
+
+    @auth.login_required
     def delete(self, nome):
+
         try:
             pessoa = Pessoas.query.filter_by(nome=nome).first()
             mensagem = 'Pessoa {} excluida com sucesso'.format(pessoa.nome)
@@ -84,7 +90,7 @@ class Pessoa(Resource):
             response = {'status': 'erro', 'mensagem': 'erro desconhecido contate o administrador da API'}
         return response
 class ListaPessoas(Resource):
-    @auth.login_required
+
     def get(self):
         try:
             pessoas = Pessoas.query.all()
@@ -97,7 +103,9 @@ class ListaPessoas(Resource):
             response = {'status': 'erro', 'mensagem': 'erro desconhecido contate o administrador da API'}
         return response
 
+    @auth.login_required
     def post(self):
+
         dados = request.json
         pessoa = Pessoas(nome=dados['nome'], idade = dados['idade'])
         pessoa.save()
@@ -122,6 +130,7 @@ class ListaAtividade(Resource):
             response = {'status': 'erro', 'mensagem': 'erro desconhecido contate o administrador da API'}
         return response
 
+    @auth.login_required
     def post(self):
         try:
             dados = request.json
@@ -158,6 +167,7 @@ class ListarAtividadesPessoa(Resource):
             response = {'status': 'erro', 'mensagem': 'erro desconhecido contate o administrador da API'}
         return response
 class ModificarStatusAtividades(Resource):
+    @auth.login_required
     def put(self,id):
         try:
             atividades = Atividades.query.filter_by(id=id).first()

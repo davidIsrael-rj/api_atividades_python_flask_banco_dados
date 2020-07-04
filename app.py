@@ -41,7 +41,7 @@ def verificacao(login, senha):
             response =Usuario.query.filter_by(login = login, senha = senha).first()
     return response
 class Pessoa(Resource):
-    @auth.login_required
+
     def get(self, nome):
         pessoa = Pessoas.query.filter_by(nome=nome).first()
         #pessoa = Pessoas.query.all()

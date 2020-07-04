@@ -47,39 +47,56 @@ class Pessoa(Resource):
                 'status':'error',
                 'mensagem':'Pessoa não encontrada'
             }
+        except Exception:
+            response = {'status': 'erro', 'mensagem': 'erro desconhecido contate o administrador da API'}
         return response
     def put(self, nome):
-        pessoa = Pessoas.query.filter_by(nome=nome).first()
-        dados = request.json
-        if 'nome' in dados:
-            pessoa.nome = dados['nome']
-        if 'idade' in dados:
-            pessoa.idade = dados['idade']
-        pessoa.save()
-        response = {
-            'id':pessoa.id,
-            'nome':pessoa.nome,
-            'idade':pessoa.idade
-        }
+        try:
+            pessoa = Pessoas.query.filter_by(nome=nome).first()
+            dados = request.json
+            if 'nome' in dados:
+                pessoa.nome = dados['nome']
+            if 'idade' in dados:
+                pessoa.idade = dados['idade']
+            pessoa.save()
+            response = {
+                'id':pessoa.id,
+                'nome':pessoa.nome,
+                'idade':pessoa.idade
+            }
+        except AttributeError:
+            mensagem='O nome <{}> não foi encontrado na base de dados'.format(nome)
+            response = {'status':'erro', 'mensagem':mensagem}
+        except Exception:
+            response = {'status':'erro', 'mensagem':'erro desconhecido contate o administrador da API'}
         return response
     def delete(self, nome):
-        pessoa = Pessoas.query.filter_by(nome=nome).first()
-        mensagem = 'Pessoa {} excluida com sucesso'.format(pessoa.nome)
-        pessoa.delete()
-        return{'status': 'sucesso', 'mensagem':mensagem}
+        try:
+            pessoa = Pessoas.query.filter_by(nome=nome).first()
+            mensagem = 'Pessoa {} excluida com sucesso'.format(pessoa.nome)
+            pessoa.delete()
+            response ={'status': 'sucesso', 'mensagem':mensagem}
+
+        except AttributeError:
+            mensagem = 'não foi encontrado o registro <{}> para deletar'.format(nome)
+            response = {'status':'error','mensagem':mensagem}
+        except Exception:
+            response = {'status': 'erro', 'mensagem': 'erro desconhecido contate o administrador da API'}
+        return response
 class ListaPessoas(Resource):
     @auth.login_required
     def get(self):
-        pessoas = Pessoas.query.all()
-        response = [{
-            'id':i.id,
-            'nome':i.nome,
-            'idade':i.idade
-        } for i in pessoas]
-        print(response)
+        try:
+            pessoas = Pessoas.query.all()
+            response = [{
+                'id':i.id,
+                'nome':i.nome,
+                'idade':i.idade
+            } for i in pessoas]
+        except Exception:
+            response = {'status': 'erro', 'mensagem': 'erro desconhecido contate o administrador da API'}
         return response
-        #for i in pessoas:
-         #   lista.apend('nome':i.nome)
+
     def post(self):
         dados = request.json
         pessoa = Pessoas(nome=dados['nome'], idade = dados['idade'])
@@ -93,51 +110,72 @@ class ListaPessoas(Resource):
 
 class ListaAtividade(Resource):
     def get(self):
-        atividades = Atividades.query.all()
-        response = [{
-            'id': i.id,
-            'nome':i.nome,
-            'pessoa':i.pessoa.nome,
-            'status':status(i.status)
-        }for i in atividades]
+        try:
+            atividades = Atividades.query.all()
+            response = [{
+                'id': i.id,
+                'nome':i.nome,
+                'pessoa':i.pessoa.nome,
+                'status':status(i.status)
+            }for i in atividades]
+        except Exception:
+            response = {'status': 'erro', 'mensagem': 'erro desconhecido contate o administrador da API'}
         return response
 
     def post(self):
-        dados = request.json
-        pessoa =  Pessoas.query.filter_by(nome=dados['pessoa']).first()
-        atividade = Atividades(nome=dados['nome'], pessoa = pessoa, status = dados['status'])#Será lançado 0 no status, pois é uma atividade nova que esta pendente
-        atividade.save()
-        response = {
-            'pessoa':atividade.pessoa.nome,
-            'nome':atividade.nome,
-            'id':atividade.id,
-            'status':status(atividade.status)
-        }
+        try:
+            dados = request.json
+            pessoa =  Pessoas.query.filter_by(nome=dados['pessoa']).first()
+            atividade = Atividades(nome=dados['nome'], pessoa = pessoa, status = dados['status'])#Será lançado 0 no status, pois é uma atividade nova que esta pendente
+            atividade.save()
+            response = {
+                'pessoa':atividade.pessoa.nome,
+                'nome':atividade.nome,
+                'id':atividade.id,
+                'status':status(atividade.status)
+            }
+        except AttributeError:
+            mensagem = 'O nome <{}> não foi encontrado na base de dados'.format(dados['pessoa'])
+            response = {'status': 'erro', 'mensagem': mensagem}
+        except Exception:
+            response = {'status': 'erro', 'mensagem': 'erro desconhecido contate o administrador da API'}
         return response
 class ListarAtividadesPessoa(Resource):
     def get(self,nome):
-        atividades = Atividades.query.all()
-        response=[{
-            'id':i.id,
-            'nome':i.nome,
-            'pessoa':i.pessoa.nome,
-            'status':status(i.status)
+        try:
+            atividades = Atividades.query.all()
+            response=[{
+                'id':i.id,
+                'nome':i.nome,
+                'pessoa':i.pessoa.nome,
+                'status':status(i.status)
 
-        }for i in atividades if i.pessoa.nome == nome]
+            }for i in atividades if i.pessoa.nome == nome]
+        except AttributeError:
+            mensagem = 'O nome <{}> não foi encontrado na base de dados'.format(nome)
+            response = {'status': 'erro', 'mensagem': mensagem}
+        except Exception:
+            response = {'status': 'erro', 'mensagem': 'erro desconhecido contate o administrador da API'}
         return response
 class ModificarStatusAtividades(Resource):
     def put(self,id):
-        atividades = Atividades.query.filter_by(id=id).first()
-        dados = request.json
-        print(dados)
-        atividades.status = dados['status']
-        atividades.save()
-        response = {
-            'id':atividades.id,
-            'nome':atividades.nome,
-            'pessoa':atividades.pessoa.nome,
-            'status':status(atividades.status)
-            }
+        try:
+            atividades = Atividades.query.filter_by(id=id).first()
+            dados = request.json
+            print(dados)
+            atividades.status = dados['status']
+            atividades.save()
+            response = {
+                'id':atividades.id,
+                'nome':atividades.nome,
+                'pessoa':atividades.pessoa.nome,
+                'status':status(atividades.status)
+                }
+        except AttributeError:
+            mensagem = 'O id <{}> não foi encontrado na base de dados'.format(id)
+            response = {'status': 'erro', 'mensagem': mensagem}
+        except Exception:
+            response = {'status': 'erro', 'mensagem': 'erro desconhecido contate o administrador da API'}
         return response
 
 api.add_resource(Pessoa, '/pessoa/<string:nome>/')

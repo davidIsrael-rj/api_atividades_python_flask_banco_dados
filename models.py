@@ -50,6 +50,7 @@ class Usuario(Base):
     id = Column(Integer, primary_key=True)
     login = Column(String(20),unique=True)
     senha = Column(String(20))
+    ativo = Column(Integer)#0=deativado e 1=ativado
 
     def __repr__(self):
         return '<Usuario {}>'.format(self.login)

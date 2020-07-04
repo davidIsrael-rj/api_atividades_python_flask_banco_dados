@@ -27,12 +27,21 @@ def status(i):
 
 @auth.verify_password
 def verificacao(login, senha):
-    if not(login, senha):
-        return False
-    return Usuario.query.filter_by(login = login, senha = senha).first()
+    dados = Usuario.query.filter_by(login = login).first()
+    #print('Status do usuario {} = {}'.format(login, dados.ativo))
+    if dados.ativo ==0:
+        print('Usuario {} desstivado'.format(login))
+        response = False
 
+    else:
+        #print('Usuario {} Ativado'.format(login))
+        if not(login, senha):
+            response = False
+        else:
+            response =Usuario.query.filter_by(login = login, senha = senha).first()
+    return response
 class Pessoa(Resource):
-
+    @auth.login_required
     def get(self, nome):
         pessoa = Pessoas.query.filter_by(nome=nome).first()
         #pessoa = Pessoas.query.all()
@@ -117,6 +126,7 @@ class ListaPessoas(Resource):
         return response
 
 class ListaAtividade(Resource):
+    @auth.login_required
     def get(self):
         try:
             atividades = Atividades.query.all()
@@ -172,7 +182,7 @@ class ModificarStatusAtividades(Resource):
         try:
             atividades = Atividades.query.filter_by(id=id).first()
             dados = request.json
-            print(dados)
+            #print(dados)
             atividades.status = dados['status']
             atividades.save()
             response = {
